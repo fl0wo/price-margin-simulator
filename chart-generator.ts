@@ -3,14 +3,18 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { ChartJSNodeCanvas } from 'chartjs-node-canvas';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 // Register Chart.js components
 Chart.register(...registerables);
+// Register DataLabels plugin
+Chart.register(ChartDataLabels);
 
 // Function to generate data for different budgets
 function generateData() {
   const budgets = [];
   const pricesPerItem = [];
+  const itemCounts = [];
   
   // Budgets from 50k to 250k in steps of 10k
   for (let budget = 30_000; budget <= 250_000; budget += 10_000) {
@@ -56,17 +60,18 @@ function generateData() {
     
     // Store the data
     pricesPerItem.push(totalCost);
+    itemCounts.push(itemCount);
     
     // Log the data
     console.log(`Budget: $${budget}, Items: ${itemCount}, Price per item: $${totalCost.toFixed(2)}, Margin: ${(simulator.calculateMarginPercentage(itemCount) * 100).toFixed(2)}%`);
   }
   
-  return { budgets, pricesPerItem };
+  return { budgets, pricesPerItem, itemCounts };
 }
 
 // Generate the chart
 async function generateChart() {
-  const { budgets, pricesPerItem } = generateData();
+  const { budgets, pricesPerItem, itemCounts } = generateData();
   
   // Create a new chart
   const width = 800;
@@ -140,6 +145,26 @@ async function generateChart() {
         },
         legend: {
           position: 'bottom'
+        },
+        datalabels: {
+          align: 'top',
+          anchor: 'end',
+          formatter: (value, context) => {
+            return itemCounts[context.dataIndex].toLocaleString() + ' items';
+          },
+          font: {
+            weight: 'bold',
+            size: 11
+          },
+          color: '#666',
+          backgroundColor: 'rgba(255, 255, 255, 0.7)',
+          borderRadius: 4,
+          padding: {
+            top: 4,
+            bottom: 4,
+            left: 6,
+            right: 6
+          }
         }
       }
     }
