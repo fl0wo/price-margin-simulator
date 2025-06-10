@@ -9,7 +9,10 @@ function toUSD(euros: number): number {
 
     const marginSimulator = new MarginSimulator({
         client: {
-            budget: 60_000, // dollars
+            budget: 50_000, // dollars
+            // buysAtPricePerItem: (numberOfItems:number) => {
+            //     return 7.14; // dollars
+            // }
         },
 
         purchaser: {
@@ -28,13 +31,12 @@ function toUSD(euros: number): number {
                 }
             },
             // toUSD(3.0),
-            // desiredMargin:  (numberOfItems:number) => {
-            //     // 8000 items = 0.3 margin
-            //     // 10000 items = 0.25 margin
-            //     // 10000+ items = 0.2 margin
-            //
-            //     return 0.25;
-            // }
+            desiredMargin:  (numberOfItems:number) => {
+                // 8000 items = 0.3 margin
+                // 10000 items = 0.25 margin
+                // 10000+ items = 0.2 margin
+                return 0.25;
+            }
             // 0.25, // +30% margin
         },
 
@@ -73,5 +75,8 @@ function toUSD(euros: number): number {
         
     marginSimulator
         .logTotalCostPerItemToTheClient();
+        
+    marginSimulator
+        .logMarginPercentageToTheClient();
 
 })();
